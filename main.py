@@ -1,25 +1,23 @@
 import numpy as np
 from typing import List, Dict
 import matplotlib.pyplot as plt
+import sys
 
 def main():
-    line = input("method, init, final, times and angles " + 
-        "(separated by spaces, use colon(:) for non-existent init/final vel or acc): ")
     # list lengths are n, 2, 2, n+1, n+1 => total: 3n+6
-
-    strings = line.split()
-    n = (len(strings) - 6) / 3
+    args = sys.argv[1:]
+    n = (len(args) - 6) / 3
 
     if n%1!=0 or n<2:
         print("Invalid input")
         return
     
     n = int(n)
-    method = [int(strings[i]) for i in range(0, n)]
-    init = [strings[i] for i in range(n, n+2)]
-    final = [strings[i] for i in range(n+2, n+4)]
-    times = [float(strings[i]) for i in range(n+4, 2*n+5)]
-    angles = [float(strings[i]) for i in range(2*n+5, 3*n+6)]
+    method = [int(args[i]) for i in range(0, n)]
+    init = args[n:n+2]
+    final = args[n+2:n+4]
+    times = [float(args[i]) for i in range(n+4, 2*n+5)]
+    angles = [float(args[i]) for i in range(2*n+5, 3*n+6)]
     
     X = solve(method, init, final, times, angles)
     print("X = ")
@@ -172,4 +170,3 @@ def plot(polys, times, angles):
     plt.show()
 
 main()
-
