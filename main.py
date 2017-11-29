@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import sys
 
 def main():
+    # pretty print for numpy array
+    np.set_printoptions(precision=3)
+    np.set_printoptions(suppress=True)
+
     # list lengths are n, 2, 2, n+1, n+1 => total: 3n+6
     args = sys.argv[1:]
     n = (len(args) - 6) / 3
@@ -13,19 +17,20 @@ def main():
         return
     
     n = int(n)
-    method = [int(args[i]) for i in range(0, n)]
+    method = [int(i) for i in args[0:n]]
     init = args[n:n+2]
     final = args[n+2:n+4]
-    times = [float(args[i]) for i in range(n+4, 2*n+5)]
-    angles = [float(args[i]) for i in range(2*n+5, 3*n+6)]
+    times = [float(i) for i in args[n+4:2*n+5]]
+    angles = [float(i) for i in args[2*n+5:3*n+6]]
     
     X = solve(method, init, final, times, angles)
-    print("X = ")
+    print("X = ", end="")
     print(X)
 
     polys = get_polys(method, X)
+    print("\nThe coefficients, starting from order 0, are")
     for i in polys:
-        print(i)
+        print(np.array(i))
     
     plot(polys, times, angles)
 
@@ -152,10 +157,10 @@ def solve(method, init, final, times, angles):
     A = np.array(A_rows)
     Y_array = np.array(Y)
 
-    print("A = ")
+    print("A = ", end="")
     print(A)
 
-    print("Y = ")
+    print("Y = ", end="")
     print(Y_array)
 
     X = np.linalg.solve(A, Y_array)
