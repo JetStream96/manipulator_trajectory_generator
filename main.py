@@ -34,12 +34,12 @@ def main():
     
     plot(polys, times, angles)
 
-def get_polys(methods, X):
+def get_polys(method, X):
     result = []
     index = 0
-    for i in range(0, len(methods)):
-        count = methods[i]+1
-        result.append([X[index+i] for i in range(0, count)])
+    for i in range(0, len(method)):
+        count = method[i]+1
+        result.append(X[index:index+count])
         index += count
 
     return result
@@ -147,7 +147,7 @@ def solve(method, init, final, times, angles):
         
         if i!=0:
             # vel and acc should match the last index
-            A_rows.append( subtract_each(vel_start_row, last_vel_end_row))
+            A_rows.append(subtract_each(vel_start_row, last_vel_end_row))
             A_rows.append(subtract_each(acc_start_row, last_acc_end_row))
             Y+=[0,0]
         
