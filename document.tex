@@ -1,0 +1,113 @@
+\documentclass[a4paper]{article}
+\pagestyle{empty} % for cropping
+\usepackage{amsmath}
+\usepackage{arydshln}
+\title{Documentation}
+\date{}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\begin{document}
+  \maketitle
+
+  	The general idea is as follows. Let the method we use be represented as python List: $[m_{0}, m_{1}, ... , m_{n-1}]$. In the example of 4-3-4, the list is [4, 3, 4]. The trajectory is required to go through $\theta_{0}, \theta_{1}, ..., \theta_{n}$ at times $t_{0}, t_{1}, ... , t_{n}$, respectively. The initial and final velocities are $\dot{\theta_{0}}$ and $\dot{\theta_{n}}$, and accelerations are $\ddot{\theta_{0}}$ and $\ddot{\theta_{n}}$.
+  	
+  	The trajectory consists of n polynomials:
+  	
+  	\begin{equation*}
+	  	y_{0}=a_{00}+a_{01}t+a_{02}t^{2}+...+a_{0m_{0}}t^{m_{0}}
+	\end{equation*}
+	\begin{equation*}
+	  	y_{1}=a_{10}+a_{11}t+a_{12}t^{2}+...+a_{1m_{1}}t^{m_{1}}
+	\end{equation*}
+	\begin{equation*}
+		...
+	\end{equation*}
+  	\begin{equation*}
+  		y_{n-1}=a_{(n-1)0}+a_{(n-1)1}t+a_{(n-1)2}t^{2}+...+a_{(n-1)m_{n-1}}t^{m_{n-1}}
+  	\end{equation*}
+  	
+  	The unknown coefficients, $X$, is a vector that we need to find:
+  	\begin{equation*}
+	  	X=[a_{00} \quad a_{01} \quad ... \quad a_{0m_{0}} \quad a_{10} \quad ... \quad a_{(n-1)0} \quad ... \quad a_{(n-1)m_{n-1}}]
+  	\end{equation*}
+  	
+  	There are 3 equations for the initial and final points since the position, velocity and acceleration have to match. For other points, there are 4 equations: 2 for matching the position for the polynomial on left and right, 1 for continuous velocity and 1 for continuous acceleration. The number of equations we have is $4(n-1)+3 \cdot 2=4n+2$.
+  	
+  	The number of equations calculated above can, in some cases, exceeds the number of unknowns. One example is 3-3-3-3-3, where number of unknowns is only 20 whereas number of equations is $4n+2=22$. Therefore, the python script allows omitting certain velocities and/or accelerations by entering colon(:) instead of a value. This reduces the number of equations and ensure the linear system has unique solution.
+  	
+  	Now we list all the equations. For $t=t_{0}$, the initial position must match:
+  	\begin{equation*}
+	  	a_{00}+a_{01}t_{0}+a_{02}t_{0}^{2}+...+a_{0m_{0}}t_{0}^{m_{0}}=\theta_{0}
+  	\end{equation*}
+  	
+  	This is equivalent to 
+  	
+  	\begin{equation}
+	  	(1 \quad t_{0} \quad t_{0}^{2} \quad ... \quad t_{0}^{m_{0}} \quad 0 \quad... \quad 0)X=\theta_{0}
+  	\end{equation}
+  	
+  	Equation for initial velocity and accelerations are similar:
+  	
+  	\begin{equation*}
+	  	0+a_{01}+2a_{02}t_{0}+...+m_{0} a_{0m_{0}} t_{0}^{m_{0}-1}=\dot{\theta_{0}}
+  	\end{equation*}
+  	\begin{equation*}
+  		0+0+2a_{02}+...+m_{0} (m_{0}-1) a_{0m_{0}} t_{0}^{m_{0}-2}=\ddot{\theta_{0}}
+  	\end{equation*}
+  	
+  	Or, 
+  	\begin{equation}
+  	(0 \quad 1 \quad 2t_{0} \quad ... \quad m_{0} t_{0}^{m_{0}-1} \quad 0 \quad... \quad 0)X=\dot{\theta_{0}}
+  	\end{equation}
+  	
+  	\begin{equation}
+  	(0 \quad 0 \quad 2 \quad ... \quad m_{0} (m_{0}-1) t_{0}^{m_{0}-2} \quad 0 \quad... \quad 0)X=\ddot{\theta_{0}}
+  	\end{equation}
+  	
+  	For $t=t_{1}$, we have equations for matching position for polynomial $y_{0}$
+  	
+  	\begin{equation}
+  	(1 \quad t_{1} \quad t_{1}^{2} \quad ... \quad t_{1}^{m_{0}} \quad 0 \quad... \quad 0)X=\theta_{1}
+  	\end{equation}
+  	
+  	Also for $y_{1}$,
+  	
+  	\begin{equation*}
+  	a_{10}+a_{11}t_{1}+a_{12}t_{1}^{2}+...+a_{1m_{1}}t_{1}^{m_{1}}=\theta_{1}
+  	\end{equation*}
+  	
+  	The above is equivalent to
+  	
+  	\begin{equation}
+  	(\underbrace{ 0 \quad ... \quad 0}_\text{$m_{0}+1$ zeros} \quad 1 \quad t_{1} \quad t_{1}^{2} \quad ... \quad t_{1}^{m_{1}} \quad 0 \quad... \quad 0)X=\theta_{1}
+  	\end{equation}
+  	
+  	Equation for matching velocity is
+  	
+  	\begin{equation*}
+  		0+a_{01}+2a_{02}t_{1}+...+m_{0} a_{0m_{0}} t_{1}^{m_{0}-1}=
+  		0+a_{11}+2a_{12}t_{1}+...+m_{1} a_{1m_{1}} t_{1}^{m_{1}-1}
+  	\end{equation*}
+  	
+  	or,
+  	
+  	\begin{equation}
+  	(0 \quad 1 \quad 2t_{1} \quad ... \quad m_{0} t_{1}^{m_{0}-1} \quad 
+  	0 \quad -1 \quad -2t_{1} \quad ... \quad -m_{1} t_{1}^{m_{1}-1} \quad 
+  	0 \quad... \quad 0)X=0
+  	\end{equation}
+  	
+  	Equation for matching acceleration is similar
+  	\begin{equation}
+  	(0 \quad 0 \quad 2 \quad ... \quad m_{0} (m_{0}-1) t_{1}^{m_{0}-2} \quad
+  	0 \quad 0 \quad -2 \quad ... \quad -m_{1} (m_{1}-1) t_{1}^{m_{1}-2} \quad
+  	0 \quad... \quad 0)X=0
+  	\end{equation}
+  	
+  	With equations like (1) - (7), put the vectors on the LHS as rows of a matrix, call $A$, and put the RHS in a vector $Y$. We have a linear system $AX=Y$. The polynomial coefficients $X$ is easily solved.
+
+  
+\end{document}
